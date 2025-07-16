@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
-//import 'screens/home_screen.dart';
-import 'package:allergyapp/screens/home_screen.dart';
+import 'package:allergyapp/screens/allergy_profile_screen.dart'; // Ensure this import path is correct
 
 void main() {
-  runApp(AllergyApp());
+  runApp(const MyApp());
 }
 
-class AllergyApp extends StatelessWidget {
-  const AllergyApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Allergy Identifier',
-      theme: ThemeData(primarySwatch: Colors.deepPurple),
-      home: HomeScreen(),
+      title: 'Allergy Detector',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: const AllergyProfileScreen(), // Ensure 'const' is used here
     );
   }
 }
