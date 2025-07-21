@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:allergyapp/screens/allergy_profile_screen.dart'; // Ensure this import path is correct
+import 'package:allergyapp/screens/onboarding_screens.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'screens/login_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -11,12 +15,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Allergy Detector',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: const AllergyProfileScreen(), // Ensure 'const' is used here
+      debugShowCheckedModeBanner: false,
+      title: 'Allergy App',
+      home: LoginScreen(), // ✅ This must be your starting screen
     );
   }
 }

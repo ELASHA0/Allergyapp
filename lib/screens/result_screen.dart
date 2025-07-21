@@ -6,56 +6,85 @@ class ResultScreen extends StatelessWidget {
 
   const ResultScreen({super.key, required this.result});
 
+  // Define your consistent color palette based on "Tides" scheme
+  static const Color backgroundColor = Color(
+    0xFFE9EBED,
+  ); // Lightest color from Tides
+  static const Color primaryAccent = Color(
+    0xFF006F98,
+  ); // Darkest blue from Tides
+  static const Color secondaryAccent = Color(0xFF1ABBEF); // Mid-blue from Tides
+  static const Color lightBlue = Color(0xFF7FD2FD); // Light blue from Tides
+  static const Color textColor = Color(
+    0xFF003049,
+  ); // A darker, complementary blue/navy for text
+  static const Color lightTextColor =
+      Colors.white; // Pure white for text on primary accent background
+
   // Helper widget to build a styled section with a heading and content box
   Widget _buildInfoSection(
     String title,
     Widget content, {
     Color? headingBgColor,
+    IconData? headingIcon, // Optional icon for the heading
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        vertical: 10.0,
+      ), // More vertical margin between sections
+      decoration: BoxDecoration(
+        color: Colors.white, // White background for the entire section card
+        borderRadius: BorderRadius.circular(
+          18,
+        ), // More rounded corners for the section card
+        boxShadow: [
+          BoxShadow(
+            color: textColor.withOpacity(0.1), // Subtle shadow for depth
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Heading Box
           Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 12.0,
+              horizontal: 20.0, // More horizontal padding
+              vertical: 14.0, // More vertical padding
             ),
             decoration: BoxDecoration(
               color:
                   headingBgColor ??
-                  Colors
-                      .blueAccent
-                      .shade100, // Default heading background color
-              borderRadius: BorderRadius.circular(
-                10,
-              ), // Rounded corners for the heading
-            ),
-            width: double.infinity, // Make it span the full width
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.black87, // Darker text for contrast
+                  lightBlue.withOpacity(
+                    0.3,
+                  ), // Default to a lighter accent from new palette
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(18), // Match parent container's top radius
               ),
             ),
-          ),
-          const SizedBox(height: 8), // Space between heading and content
-          // Content Box
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Colors
-                  .grey
-                  .shade200, // Different background color for content
-              borderRadius: BorderRadius.circular(
-                10,
-              ), // Rounded corners for content box
+            width: double.infinity,
+            child: Row(
+              children: [
+                if (headingIcon != null) ...[
+                  Icon(headingIcon, color: textColor, size: 24),
+                  const SizedBox(width: 10),
+                ],
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20, // Slightly larger font for headings
+                    color: textColor, // Use consistent dark text color
+                  ),
+                ),
+              ],
             ),
-            width: double.infinity, // Make it span the full width
+          ),
+          // Content Box
+          Padding(
+            padding: const EdgeInsets.all(20.0), // Generous padding for content
             child: content,
           ),
         ],
@@ -67,32 +96,76 @@ class ResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Map<String, dynamic> parsedResult = {};
     try {
-      // Attempt to decode the result string into a Map
       parsedResult = json.decode(result) as Map<String, dynamic>;
     } catch (e) {
-      // If decoding fails, it means the result is not a valid JSON.
-      // This typically happens if there was an error response from the server.
       return Scaffold(
-        appBar: AppBar(title: const Text('Analysis Result')),
+        backgroundColor: backgroundColor, // Apply new background color
+        appBar: AppBar(
+          title: const Text(
+            'Analysis Result',
+            style: TextStyle(
+              color: lightTextColor,
+              fontWeight: FontWeight.bold,
+            ), // Use lightTextColor
+          ),
+          backgroundColor: primaryAccent, // Use primaryAccent for app bar
+          iconTheme: const IconThemeData(
+            color: lightTextColor,
+          ), // Use lightTextColor
+          elevation: 6.0,
+          shadowColor: textColor.withOpacity(0.4),
+        ),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(25.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 50),
-                const SizedBox(height: 10),
+                Icon(
+                  Icons.sentiment_dissatisfied_rounded,
+                  color: secondaryAccent, // Use secondaryAccent
+                  size: 80,
+                ), // More expressive icon
+                const SizedBox(height: 20),
                 const Text(
-                  "Failed to parse analysis result.",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  "Oops! Something went wrong...",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: textColor, // Use textColor
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "Raw response: $result", // Show the raw response for debugging
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  "We couldn't process the label. Please try scanning again.",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: textColor.withOpacity(0.7),
+                  ), // Use textColor with opacity
                   textAlign: TextAlign.center,
                 ),
+                const SizedBox(height: 20),
+                Text(
+                  "Error Details: ${e.toString()}", // More descriptive error message
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: textColor.withOpacity(0.5),
+                  ), // Use textColor with opacity
+                  textAlign: TextAlign.center,
+                ),
+                if (result.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      "Raw Response: $result",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: textColor.withOpacity(0.4),
+                      ), // Use textColor with opacity
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -100,119 +173,225 @@ class ResultScreen extends StatelessWidget {
       );
     }
 
-    // Safely extract data from the parsed JSON with null checks
-    // Provide default empty lists or strings if keys are missing
     List<dynamic> extractedIngredients =
         parsedResult['extracted_ingredients'] ?? [];
     List<dynamic> detectedAllergens = parsedResult['detected_allergens'] ?? [];
     String recommendation =
-        parsedResult['recommendation'] ?? "No recommendation provided.";
-    // Convert risk_level to lowercase for consistent comparison
+        parsedResult['recommendation'] ??
+        "No specific recommendation provided.";
     String riskLevel =
         parsedResult['risk_level']?.toString().toLowerCase() ?? "unknown";
 
-    // Determine the color and display text for the risk level
+    // Determine the color, icon, and display text for the risk level
     Color riskBgColor;
     Color riskTextColor;
     String riskDisplayText;
+    IconData riskIcon;
 
     switch (riskLevel) {
       case "high":
-        riskBgColor = Colors.red.shade200; // Light red background
-        riskTextColor = Colors.red.shade800; // Darker red text
-        riskDisplayText = "HIGH"; // Bold and uppercase for emphasis
+        riskBgColor = Colors
+            .red
+            .shade100; // Keeping red for high risk (universal understanding)
+        riskTextColor = Colors.red.shade700;
+        riskDisplayText = "HIGH RISK";
+        riskIcon = Icons.warning_rounded; // Bold warning icon
         break;
       case "moderate":
-        riskBgColor = Colors.amber.shade200; // Light amber background
-        riskTextColor = Colors.amber.shade800; // Darker amber text
-        riskDisplayText = "MODERATE";
+        riskBgColor = Colors.amber.shade100; // Keeping amber for moderate risk
+        riskTextColor = Colors.amber.shade700;
+        riskDisplayText = "MODERATE RISK";
+        riskIcon = Icons.info_rounded; // Info icon
         break;
       case "low":
-        riskBgColor = Colors.green.shade200; // Light green background
-        riskTextColor = Colors.green.shade800; // Darker green text
-        riskDisplayText = "LOW";
+        riskBgColor = Colors.green.shade100; // Keeping green for low risk
+        riskTextColor = Colors.green.shade700;
+        riskDisplayText = "LOW RISK";
+        riskIcon = Icons.check_circle_rounded; // Checkmark icon
         break;
       default:
-        riskBgColor = Colors.grey.shade200; // Default grey background
-        riskTextColor = Colors.black; // Default black text
-        riskDisplayText = "UNKNOWN";
+        riskBgColor = Colors.grey.shade100;
+        riskTextColor = Colors.grey.shade700;
+        riskDisplayText = "UNKNOWN RISK";
+        riskIcon = Icons.help_outline_rounded; // Help icon for unknown
         break;
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Analysis Result')),
+      backgroundColor:
+          backgroundColor, // Apply new background color to the whole screen
+      appBar: AppBar(
+        backgroundColor: primaryAccent, // Use primary accent for app bar
+        elevation: 6.0,
+        shadowColor: textColor.withOpacity(0.4),
+        title: const Text(
+          'Analysis Results',
+          style: TextStyle(
+            color: lightTextColor, // Use lightTextColor (white) for title
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.8,
+            fontSize: 22,
+          ),
+        ),
+        centerTitle: true,
+        iconTheme: const IconThemeData(
+          color: lightTextColor, // Back button color is white
+        ),
+      ),
       body: SingleChildScrollView(
-        // Use SingleChildScrollView for scrollability
-        padding: const EdgeInsets.all(16.0), // Overall padding for the screen
+        padding: const EdgeInsets.all(20.0), // More overall padding
         child: Column(
-          mainAxisSize: MainAxisSize.min, // Added this line to help with layout
-          crossAxisAlignment:
-              CrossAxisAlignment.start, // Align content to the start
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Risk Level Section
+            // --- Risk Level Section ---
             _buildInfoSection(
-              "Risk Level",
-              Text(
-                riskDisplayText,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold, // Make it bold
-                  color: riskTextColor, // Apply the determined text color
-                ),
+              "Overall Risk Assessment",
+              Row(
+                children: [
+                  Icon(
+                    riskIcon,
+                    color: riskTextColor,
+                    size: 30,
+                  ), // Icon next to text
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      riskDisplayText,
+                      style: TextStyle(
+                        fontSize: 22, // Larger font for impact
+                        fontWeight: FontWeight.w900, // Extra bold
+                        color: riskTextColor,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              headingBgColor:
-                  riskBgColor, // Use the determined background color for the heading
+              headingBgColor: riskBgColor, // Dynamic background based on risk
+              headingIcon: Icons
+                  .shield_moon_rounded, // An icon for the heading title itself
             ),
-            const SizedBox(height: 16), // Space between sections
-            // Extracted Ingredients Section
+            // --- Extracted Ingredients Section ---
             _buildInfoSection(
               "Extracted Ingredients",
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: extractedIngredients.isEmpty
-                    ? [const Text("No ingredients extracted.")]
-                    : extractedIngredients
-                          .map(
-                            (ingredient) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4.0),
-                              child: Text("- $ingredient"),
+              extractedIngredients.isEmpty
+                  ? Text(
+                      "No ingredients were clearly extracted. Please ensure the label is well-lit and clear.",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: textColor.withOpacity(0.7),
+                      ), // Use textColor
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true, // Important for ListView inside Column
+                      physics:
+                          const NeverScrollableScrollPhysics(), // Disable internal scrolling
+                      itemCount: extractedIngredients.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Text(
+                            "• ${extractedIngredients[index]}", // Bullet point list
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: textColor, // Dark text
                             ),
-                          )
-                          .toList(),
-              ),
+                          ),
+                        );
+                      },
+                    ),
+              headingIcon:
+                  Icons.format_list_bulleted_rounded, // Icon for heading
             ),
-            const SizedBox(height: 16),
-
-            // Detected Allergens Section
+            // --- Detected Allergens Section ---
             _buildInfoSection(
               "Detected Allergens",
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: detectedAllergens.isEmpty
-                    ? [const Text("No allergens detected.")]
-                    : detectedAllergens
-                          .map(
-                            (allergen) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4.0),
-                              child: Text(
-                                "⚠️ $allergen", // Add a warning emoji
-                                style: const TextStyle(
-                                  color:
-                                      Colors.red, // Highlight allergens in red
-                                  fontWeight: FontWeight.bold, // Make them bold
+              detectedAllergens.isEmpty
+                  ? Text(
+                      "Great news! No known allergens from your profile were detected in the label.",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors
+                            .green
+                            .shade700, // Keeping green for positive outcome
+                        fontStyle: FontStyle.italic,
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: detectedAllergens.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 6.0,
+                            horizontal: 10.0,
+                          ),
+                          margin: const EdgeInsets.symmetric(vertical: 4.0),
+                          decoration: BoxDecoration(
+                            color: Colors
+                                .red
+                                .shade50, // Very light red background for each allergen
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.red.shade200,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.dangerous_rounded,
+                                color: Colors.red, // Danger icon in red
+                                size: 20,
+                              ), // Danger icon
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  detectedAllergens[index]
+                                      .toString()
+                                      .toUpperCase(), // Uppercase for emphasis
+                                  style: TextStyle(
+                                    color: Colors.red.shade800, // Dark red text
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
-                            ),
-                          )
-                          .toList(),
-              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+              headingIcon: Icons.warning_amber_rounded, // Icon for heading
             ),
-            const SizedBox(height: 16),
-
-            // Recommendation Section
+            // --- Recommendation Section ---
             _buildInfoSection(
               "Recommendation",
-              Text(recommendation, style: const TextStyle(fontSize: 15)),
+              Text(
+                recommendation,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: textColor, // Use textColor
+                  height: 1.5, // Line height for better readability
+                ),
+              ),
+              headingIcon: Icons.lightbulb_outline_rounded, // Icon for heading
+            ),
+            const SizedBox(height: 20), // Space at the bottom
+            // Reminder/Disclaimer
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Text(
+                "Disclaimer: This app provides a preliminary analysis. Always consult with a healthcare professional for severe allergies and confirm ingredients on the product label.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: textColor.withOpacity(
+                    0.6,
+                  ), // Use textColor with opacity
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
             ),
           ],
         ),

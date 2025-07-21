@@ -53,5 +53,5 @@ if __name__ == "__main__":
     # '0.0.0.0' makes it accessible on your local network.
     # Replace '192.168.0.105' with your computer's actual local IP address
     # in the Flutter app's scan_screen.dart file.
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
 
